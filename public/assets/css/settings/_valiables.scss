@@ -1,0 +1,26 @@
+@charset "utf-8";
+
+//////サイトごとに修正
+
+$siteColor: #ef7134;
+$textColor: #000;
+$bgColor: #f2f2f2;
+$yellow: #ffd900;
+
+$font: 'Noto Sans JP', sans-serif;
+$fontMeiryo: 'Meiryo UI', 'メイリオ', 'Meiryo', sans-serif;
+$fontBarlow: 'Barlow', sans-serif;
+$fontIcon: "Font Awesome 5 Free";
+$def_fw: $fw_medium;
+
+$pc_all: 1400/100;
+$pc_inner: 1000/100;
+$pc_wH: 1400/16*9/100;
+$pc_font: 20;
+
+$sp_all: 750/100;
+$sp_inner :687/100;
+$sp_font: 30;
+
+$txtlH_pc: 18/12;
+$txtlH_sp: 46/26;

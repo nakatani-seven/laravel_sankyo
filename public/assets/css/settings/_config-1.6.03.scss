@@ -1,0 +1,1091 @@
+@charset "utf-8";
+
+///////////////////////////////////////////
+//                                       //
+//    ver.1.6.03 - 20210825              //
+//                                       //
+///////////////////////////////////////////
+
+// breakpoint//768ではない時は設定してください
+$bp: 768;
+
+//基本秒数
+$s:.4;
+
+//基本イージング
+$easing:ease-in-out;
+//カスタムイージング
+$easing02:cubic-bezier(.66,.01,.67,.71);
+
+//$set_prefix: -webkit-, -moz-, -ms-, -o-, '';
+$set_prefix: -webkit-, -ms-,'';
+$set_prefix_anime: '@-webkit-','@';
+
+//font-weight////////////////////////////////////////////////
+$fw_exlight: 200;
+$fw_light: 300;
+$fw_normal: 400;
+$fw_regular: $fw_normal;
+$fw_medium: 500;
+$fw_semibold: 600;
+$fw_bold: 700;
+$fw_black:900;
+$fs_italic:italic;
+
+//PCのみhover　要JS////////////////////////////////////////////////
+@mixin hover-pc() {
+#page{
+  &:not(.dev_tab){
+@include media-pc{
+    @content;
+}/////////END PC////////////////////////////
+  }
+}
+}
+
+//メディアクエリの設定////////////////////////////////////////////////
+//ブレイクポイント--PC
+@mixin media-pc() {
+  @media print, screen and (min-width: #{$bp}px) {
+    @content;
+  }
+}
+//ブレイクポイント--SP
+@mixin media-sp() {
+  @media only screen and (max-width: #{$bp - 1}px) {
+    @content;
+  }
+}
+//個別 ブレイクポイント
+@mixin media($min, $max:null) {
+    @if $max != null {
+        @media print, screen and (min-width: #{$min}px) and (max-width: #{$max}px) {
+            @content;
+        }
+    }
+    @else {
+        @media print, screen and (min-width: #{$min}px) {
+            @content;
+        }
+    }
+}
+@mixin ieStyle() {
+  @media all and (-ms-high-contrast: none) {
+    @content;
+  }
+}
+
+//line-heightとmarginの計算
+@mixin mg_lh($mt:0px , $mb:0px , $mr:null , $ml:null , $lH:26/15,$lastMb0:false,$lastType:false){
+  $lH_calc:$lH;
+  line-height: $lH_calc;
+  margin-top: calc(#{$mt} - (((1em*#{$lH_calc}) - 1em)/2));
+  margin-right:$mr;
+  margin-left:$ml;
+@if $lastMb0{
+  @if $lastType{
+    &:last-of-type{
+      margin-bottom:calc(0px - (((1em*#{$lH_calc}) - 1em)/2));
+    }
+    &:not(:last-of-type){
+      margin-bottom:calc(#{$mb} - (((1em*#{$lH_calc}) - 1em)/2));
+  }
+}
+@else{
+  &:last-child{
+    margin-bottom:calc(0px - (((1em*#{$lH_calc}) - 1em)/2));
+  }
+  &:not(:last-child){
+    margin-bottom:calc(#{$mb} - (((1em*#{$lH_calc}) - 1em)/2));
+}
+}
+}
+@else{
+  margin-bottom:calc(#{$mb} - (((1em*#{$lH_calc}) - 1em)/2));
+}
+  
+}
+
+//fontのよく使うセット
+/////////////////////////////////////////
+@mixin fontSet($fs:null,$fw:null,$fSty:null,$ls:null,$ff:null,$lh:null,$mt:null,$mb:null,$lastMb0:false,$lastType:false,$cl:null){
+  font-size: $fs;
+  font-weight: $fw;
+  letter-spacing: $ls;
+  font-family:$ff;
+  font-style: $fSty;
+  color:$cl;
+  @if $lh != null{
+    @if $lh != 1{
+      @if $mt == null{
+        $mt:0px;
+      }
+      @if $mb == null{
+        $mb:0px;
+      }
+      @include mg_lh($mt:$mt , $mb:$mb , $lH:$lh,$lastMb0:$lastMb0,$lastType:$lastType);
+    }
+  }
+}
+
+//fontSet簡略化
+/////////////////////////////////////////
+//@mixin fSet($fs:null,$fw:null,$ls:null,$ff:null,$lh:null,$mt:null,$mb:null,$lastMb0:false,$lastType:false,$cl:null,$dc:pc){
+//  color:$cl ;
+//  @if $dc == pc{
+//  @include fontSet($fs:$fs/$pc_font*1rem,$fw:$fw,$ls:$ls,$ff:$ff,$lh:$lh,
+//    
+//      
+//    }
+//    $mt:$mt/$pc_font*1rem,
+//    $mb:$mb/$pc_font*1rem,
+//    
+//    $lastMb0:$lastMb0,$lastType:$lastType);
+//  }
+//  @else{
+//  @include fontSet($fs:$fs/$sp_font*1rem,$fw:$fw,$ls:$ls,$ff:$ff,$lh:$lh,$mt:$mt/$sp_all*1vw,$mb:$mb/$sp_all*1vw,$lastMb0:$lastMb0,$lastType:$lastType);
+//  }
+//}
+
+//transitionの設定
+@mixin transition($s:$s,$property:all,$easing:$easing ,$delay:0){
+  @each $prefix in $set_prefix {
+    #{$prefix}transition: $property $s*1s $easing $delay*1s;
+  }
+}
+
+//transitionのdelayの設定
+@mixin transition-delay($delay02:$s){
+  @include transition($delay:$delay02);
+}
+
+//positionでの真ん中表示/////////////////////////////////////////
+//position
+@mixin position($position:absolute,$pos_t:0,$pos_r:null,$pos_b:null,$pos_l:0,$z:0){
+  position: $position;
+  top:$pos_t;
+  left: $pos_l;
+  bottom:$pos_b;
+  right:$pos_r;
+  z-index: $z;
+}
+//上下左右真ん中
+@mixin position-center($position:absolute,$z:0,$oth_tr:false,$translate_x:-50% , $translate_y:-50%,$deg:0, $scale_x:1, $scale_y:1 ,$skew_x:0,$skew_y:0){
+  position: $position;
+  top:50%;
+  left: 50%;
+  z-index: $z;
+  @if $oth_tr == false{
+    @include translate($x:-50% , $y:-50% );
+  }
+  @else{
+     @include transformAll($translate_x:$translate_x,$translate_y:$translate_y ,$deg:$deg, $scale_x:$scale_x, $scale_y:$scale_y ,$skew_x:$skew_x,$skew_y:$skew_y);
+  }
+}
+//上下真ん中
+@mixin position-y-center($position:absolute,$z:0,$pos_l:null,$pos_r:null,$oth_tr:false,$translate_x:0,$translate_y:-50%,$deg:0,$scale_x:1, $scale_y:1 ,$skew_x:0,$skew_y:0){
+  position: $position;
+  top:50%;
+  left: $pos_l;
+  right:$pos_r;
+  z-index: $z;
+  @if $oth_tr == false{
+    @include translate($y:-50% );
+  }
+  @else{
+     @include transformAll($translate_x:$translate_x,$translate_y:$translate_y,$deg:$deg, $scale_x:$scale_x,$scale_y:$scale_y ,$skew_x:$skew_x,$skew_y:$skew_y);
+  }
+}
+//左右真ん中
+@mixin position-x-center($position:absolute,$z:0,$pos_t:null,$pos_b:null,$oth_tr:false,$translate_y:0,$deg:0, $scale_x:1, $scale_y:1 ,$skew_x:0,$skew_y:0){
+  position: $position;
+  left:50%;
+  top: $pos_t;
+  bottom:$pos_b;
+  z-index: $z;
+  @if $oth_tr == false{
+    @include translate($x:-50% );
+  }
+  @else{
+     @include transformAll($translate_x:-50%,$translate_y:$translate_y,$deg:$deg, $scale_x:$scale_x, $scale_y:$scale_y ,$skew_x:$skew_x,$skew_y:$skew_y);
+  }
+}
+
+//改行なし
+//////////////////////////////////////////////////
+@mixin nowrap($ws:nowrap){
+  white-space: $ws;
+}
+//縦書き
+//////////////////////////////////////////////////
+@mixin tb-rl{
+  writing-mode: tb-rl;
+}
+//字詰
+//////////////////////////////////////////////////
+@mixin clogging{
+font-feature-settings: 'palt';
+}
+//テキストインデント
+//////////////////////////////////////////////////
+@mixin text-indent($ti:1){
+  text-indent: -$ti*1em;
+  padding-left: $ti*1em;
+}
+
+//widthとheight　同じ
+//////////////////////////////////////////////////
+@mixin square($w:null,$dc:pc){
+  //$unit:$pc_font*1rem;
+  @if $dc == pc{
+   width:$w/$pc_font*1rem;
+  height:$w/$pc_font*1rem;
+  }@else{
+    width:$w/$sp_all*1vw;
+    height:$w/$sp_all*1vw;
+  }
+}
+
+//テキスト縁取り（2pxのみ※それ以外はまだ未設定）
+/////////////////////////////////////////
+//@mixin txt_hemming($bc:#fff,$px:2){
+@mixin txt_hemming($bc:#fff){
+  text-shadow:
+    
+    $bc 2px 0px 0px,
+    $bc -2px 0px 0px,
+    
+    $bc 0px -2px 0px,
+    $bc 0px 2px 0px,
+    
+    $bc 2px 2px 0px,
+    $bc -2px 2px 0px,
+    $bc 2px -2px 0px,
+    $bc -2px -2px 0px,
+    
+    $bc 1px 2px 0px,
+    $bc -1px 2px 0px,
+    $bc 1px -2px 0px,
+    $bc -1px -2px 0px,
+    
+    $bc 2px 1px 0px,
+    $bc -2px 1px 0px,
+    $bc 2px -1px 0px,
+    $bc -2px -1px 0px,
+    
+    $bc 1px 1px 0px,
+    $bc -1px 1px 0px,
+    $bc 1px -1px 0px,
+    $bc -1px -1px 0px;
+}
+
+//object-fit(https://cdnjs.cloudflare.com/ajax/libs/object-fit-images/3.2.3/ofi.js　IE読み込み必須)
+/////////////////////////////////////////
+@mixin object-fit($w:100%,$h:100%,$p:cover,$opx:50%,$opy:50%){
+  width: $w;
+  height: $h;
+  object-fit: $p;
+  object-position:$opx $opy;
+  font-family: 'object-fit:#{$p}; object-position:#{$opx} #{$opy}; ';
+}
+
+//ios でvhを扱うときのinclude 
+/////////////////////////////////////////
+@mixin spVh($prop:height,$val:100,$fb:true){
+  @if fb == ture{
+    #{$prop}:$val*1vh;
+  }
+  #{$prop}: calc(var(--vh, 1vh) * #{$val});
+}
+
+//flex_boxでの真ん中 
+/////////////////////////////////////////
+@mixin centerToflex($aI:true){
+  @include flex_box;
+  @include justify-content(center);
+  @include flex-direction;
+  @if $aI{
+    @include align-items;
+  }
+}
+
+//擬似要素ベース
+/////////////////////////////////////////
+@mixin pseudo-base($content:"",$display:block,$w:100%,$h:100%,$bgimg:null,$bgsizeW:null,$bgsizeH:null,$bgcolor:null,$bgRe:null,$color:null){
+  content:$content;
+  display: $display;
+  width:$w;
+  height:$h;
+  background-size: $bgsizeW $bgsizeH;
+  background-color: $bgcolor;
+  background-repeat: $bgRe;
+  color:$color;
+  @if $bgimg != null{
+    background-image:url($bgimg);
+  }
+}
+
+//擬似要素画像
+/////////////////////////////////////////
+@mixin pseudo-img($w:null,$h:null,$bgimg:null,$bgsizeW:100%,$bgsizeH:100%,$bgRe:null){
+  @include pseudo-base($w:$w,$h:$h,$bgimg:$bgimg,$bgsizeW:$bgsizeW,$bgsizeH:$bgsizeH,$bgRe:$bgRe);
+}
+
+//擬似要素スクエア
+/////////////////////////////////////////
+@mixin pseudo-square($w:null,$h:null,$bgcolor:null){
+  @include pseudo-base($w:$w,$h:$h,$bgcolor:$bgcolor);
+}
+
+//上にはみ出し
+//$dcは【pc】で【/$pc_font*1rem】、【sp】で【/$sp_all*1vw】がつきます。それ以外は未対応です。
+/////////////////////////////////////////
+@mixin overTop($y:30,$mb:30,$dc:pc){
+  $eq:null;
+  $unit:null;
+  @if $dc == pc{
+    $unit:1rem;
+    $eq:$pc_font;
+  }@else if $dc == sp{
+    $unit:1vw;
+    $eq:$sp_all;
+  }
+  @include translate($y:-$y/$eq*$unit);
+  @if($y != $mb){
+    margin-bottom: ($mb - $y)/$eq*$unit;
+  }
+}
+
+//カラムの幅自動設定//////////////////////////////
+//カラム数と親widthは必須、カラムwidthと隙間widthはどちらか必須　単位は％のみ
+@mixin culumnAutoWidth($columnNo:3,$parentW:1000,$columnW:null,$gutterW:null,$yGlid:false){
+  $basePer:$parentW/100;
+  @if $columnW != null and $gutterW == null {
+    $gutterW:($parentW - $columnW*$columnNo)/($columnNo - 1);
+  }
+  @if $columnW == null and $gutterW != null {
+    $columnW:($parentW - $gutterW*($columnNo - 1))/$columnNo;
+  }
+  width:$columnW/$basePer*1%;
+  &:not(:nth-child(#{$columnNo}n)){
+    margin-right: $gutterW/$basePer*1%;
+  }
+  @if $yGlid {
+    &:not(:nth-child(-n + #{$columnNo})){
+      margin-top: $gutterW/$basePer*1%;
+    }
+  }
+}
+
+
+//form placeholderのカスタム
+/////////////////////////////////////////
+@mixin placeholder($color:null,$fFami:null) {
+  &::placeholder {
+    color: $color;
+    font-family:$fFami;
+  }
+  // IE
+  &:-ms-input-placeholder {
+    color: $color;
+    font-family:$fFami;
+  }
+  // Edge
+  &::-ms-input-placeholder {
+    color: $color;
+    font-family:$fFami;
+  }
+}
+
+//form butto初期化
+/////////////////////////////////////////
+@mixin buttonReset{
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  padding: 0;
+  appearance: none;
+  font-size: 1rem;
+  border-radius: 0;
+}
+
+//form input初期化
+/////////////////////////////////////////
+@mixin inputReset{
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  font: inherit;
+  outline: none;
+}
+
+//form radioボタンのカスタム
+//type=radioに.custom_input 次のタグにcustom_input_partsをつけてください。
+/////////////////////////////////////////
+@mixin custom_input($pc_be_size:22,$pc_af_size:13.5,$sp_be_size:37,$after_co:#000,$border_co:false,$pc_pddL:35,$sp_pddL:49){
+.custom_input{
+  opacity: 0;
+  position: absolute;
+  z-index: -100;
+  &[type="radio"]{
+    + .custom_input_parts{
+      &::before,&::after{
+        border-radius: 50%;
+      }
+      &::after{
+        background: $after_co;
+         @include position-y-center($oth_tr:true, $scale_x:0, $scale_y:0);
+      }
+    }
+    &:checked{
+      + .custom_input_parts{
+        &::after{
+          @include position-y-center($oth_tr:true, $scale_x:round-decimal($pc_af_size/$pc_be_size,1), $scale_y:round-decimal($pc_af_size/$pc_be_size,1) );
+        }
+      }
+    }
+  }
+  &[type="checkbox"]{
+    + .custom_input_parts{
+      &::after{
+        border-bottom:solid 2px $after_co;
+        border-left:solid 2px $after_co;
+        @include transform-origin($origin_x:40%,$origin_y:30%);
+         @include position-y-center($oth_tr:true, $scale_x:1, $scale_y:0,$deg:-45);
+      }
+    }
+    &:checked{
+      + .custom_input_parts{
+        &::after{
+          @include position-y-center($oth_tr:true, $scale_x:round-decimal($pc_af_size/$pc_be_size,1), $scale_y:round-decimal($pc_af_size/$pc_be_size,1),$deg:-45);
+        }
+      }
+    }
+  }
+@include media-pc{
+  &[type="radio"]{
+    + .custom_input_parts{
+      &::before,&::after{
+        width: $pc_be_size/$pc_font*1rem;
+        height:$pc_be_size/$pc_font*1rem;
+      }
+    }
+  }
+  &[type="checkbox"]{
+    + .custom_input_parts{
+      &::before{
+        width:$pc_be_size/$pc_font*1rem;
+        height:$pc_be_size/$pc_font*1rem;
+      }
+      &::after{
+        width: $pc_be_size/$pc_font*1rem;
+        height:$pc_be_size*0.7/$pc_font*1rem;
+      }
+    }
+  }
+}/////////////////pc
+@include media-sp {
+  &[type="radio"]{
+    + .custom_input_parts{
+      &::before,&::after{
+        width: $sp_be_size/$sp_all*1vw;
+        height:$sp_be_size/$sp_all*1vw;;
+      }
+    }
+  }
+  &[type="checkbox"]{
+    + .custom_input_parts{
+      &::before{
+        width: $sp_be_size/$sp_all*1vw;
+        height:$sp_be_size/$sp_all*1vw;
+      }
+      &::after{
+        width: $sp_be_size/$sp_all*1vw;
+        height:$sp_be_size*0.7/$sp_all*1vw;
+      }
+    }
+  }
+}/////////////////SP
+}
+.custom_input_parts{
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  &::before,&::after{
+    box-sizing: border-box;
+    content: "";
+    display: block;
+    left:0;
+  }
+  &::before{
+    background: $c_w;
+    @if $border_co{
+      border:1px solid $border_co;
+    }
+    @include position-y-center;
+  }
+  &::after{
+    @include transition;
+   
+  }
+  @if $pc_pddL != null{
+    @include media-pc{
+      padding-left: $pc_pddL/$pc_font*1rem;
+    }/////////////////pc
+  }
+
+  @if $sp_pddL != null{
+    @include media-sp {
+      padding-left: $sp_pddL/$sp_all*1vw;
+    }/////////////////SP
+  }
+}
+}
+
+//form selectボタンのカスタム
+/////////////////////////////////////////
+@mixin custom_select($bgImg:"../add_img/select_arrow.svg",$pc_bg_pR:14,$sp_bg_pR:24,$pc_bg_w:9.3013,$pc_bg_h:8.0552,$sp_bg_w:15.6625,$sp_bg_h:13.5641){
+  /*　矢印を消す　*/
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-indent: .01px;
+  /* Firefox用 */
+  text-overflow: "";
+  /* Firefox用 */
+  appearance: none;
+  cursor: pointer;
+  position: relative;
+  /*　背景画像の指定　*/
+    //display: block;
+    //width: 100%;
+    //height: 100%;
+    background-repeat: no-repeat;
+    background-image: url($bgImg);
+    box-sizing: border-box;
+  &::-ms-expand {
+    display: none;
+  }
+  &:focus{
+    outline: none;
+  }
+@include media-pc{
+    background-position: top 50% right $pc_bg_pR/$pc_font*1rem;
+    background-size:$pc_bg_w/$pc_font*1rem $pc_bg_h/$pc_font*1rem ;
+}/////////////////pc
+@include media-sp {
+    background-position: top 50% right $sp_bg_pR/$sp_all*1vw;
+    background-size:$pc_bg_w/$sp_all*1vw $pc_bg_h/$sp_all*1vw ;
+}/////////////////SP
+}
+
+//三角形作成//////////////////////////////////////////////////
+@mixin tri-base($pseudo:ture){
+  width: 0;
+  height: 0;
+  border-style: solid;
+  @if $pseudo != false{
+    @include pseudo-base($w:null,$h:null);
+  }
+}
+//上-正三角形
+@mixin tri-up-regular($w:50,$unit:px,$color:#000,$pseudo:ture){
+  @include tri-base($pseudo:$pseudo);
+  border-width: 0 ($w/2)+$unit ($w/2*1.7320508)+$unit ($w/2)+$unit;
+  border-color: transparent transparent $color transparent;
+}
+//上-二等辺
+@mixin tri-up-isosceles($w:50,$h:50,$unit:px,$color:#000,$pseudo:ture){
+  @include tri-base($pseudo:$pseudo);
+  border-width: 0 ($w/2)+$unit $h+$unit ($w/2)+$unit;
+  border-color: transparent transparent $color transparent;
+}
+//右-正三角形
+@mixin tri-right-regular($w:50,$unit:px,$color:#000,$pseudo:ture){
+  @include tri-base($pseudo:$pseudo);
+  border-width: ($w/2)+$unit 0 ($w/2)+$unit ($w/2*1.7320508)+$unit;
+  border-color: transparent transparent transparent $color;
+}
+//右- 二等辺
+@mixin tri-right-isosceles($w:100,$h:100,$unit:px,$color:#000,$pseudo:ture){
+  @include tri-base($pseudo:$pseudo);
+  border-width: ($h/2)+$unit  0 ($h/2)+$unit  $w+$unit;
+  border-color: transparent transparent transparent $color;
+}
+//右上- 二等辺
+@mixin tri-upperRight-isosceles($w:50,$unit:px,$color:#000,$pseudo:ture){
+  @include tri-base($pseudo:$pseudo);
+  border-width: 0 $w+$unit $w+$unit 0;
+  border-color: transparent $color transparent transparent;
+}
+//右下- 二等辺
+@mixin tri-lowerRight-isosceles($w:50,$unit:px,$color:#000,$pseudo:ture){
+  @include tri-base($pseudo:$pseudo);
+  border-width: 0 0 $w+$unit $w+$unit;
+  border-color: transparent transparent $color transparent;
+}
+//右上- 不等辺
+@mixin tri-upperRight-unequal($w:50,$h:50,$unit:px,$color:#000,$pseudo:ture){
+  @include tri-base($pseudo:$pseudo);
+  border-width:0 $w+$unit $h+$unit 0;
+  border-color:transparent $color transparent transparent;
+}
+//右下- 不等辺
+@mixin tri-lowerRight-unequal($w:50,$h:50,$unit:px,$color:#000,$pseudo:ture){
+  @include tri-base($pseudo:$pseudo);
+  border-width:0 0 $h+$unit $w+$unit;
+  border-color:transparent transparent $color transparent;
+}
+//下- 二等辺
+@mixin tri-lower-isosceles($w:100,$h:100,$unit:px,$color:#000,$pseudo:ture){
+  @include tri-base($pseudo:$pseudo);
+  border-width: $h+$unit ($w/2)+$unit 0 ($w/2)+$unit;
+  border-color: $color transparent transparent transparent;
+}
+//左- 二等辺
+@mixin tri-left-isosceles($w:100,$h:100,$unit:px,$color:#000,$pseudo:ture){
+  @include tri-base($pseudo:$pseudo);
+  border-width: ($h/2)+$unit $w+$unit ($h/2)+$unit 0;
+  border-color: transparent $color  transparent transparent;
+}
+//左上- 二等辺
+@mixin tri-upperLeft-isosceles($w:50,$unit:px,$color:#000,$pseudo:ture){
+  @include tri-base($pseudo:$pseudo);
+  border-width:$w+$unit $w+$unit 0 0;
+  border-color:$color transparent transparent transparent;
+}
+//左上- 不等辺
+@mixin tri-upperLeft-unequal($w:50,$h:50,$unit:px,$color:#000,$pseudo:ture){
+  @include tri-base($pseudo:$pseudo);
+  border-width:$h+$unit $w+$unit 0 0;
+  border-color:$color transparent transparent transparent;
+}
+//左下- 不等辺
+@mixin tri-lowerLeft-unequal($w:50,$h:50,$unit:px,$color:#000,$pseudo:ture){
+  @include tri-base($pseudo:$pseudo);
+  border-width:$h+$unit 0 0 $w+$unit ;
+  border-color:transparent transparent transparent $color;
+}
+
+//flex系//////////////////////////////////////////////////
+@mixin flex_box($wrap:wrap,$inline:false){
+  @if $inline{
+    display: -webkit-inline-flex;
+    display: inline-flex;
+  }
+  @else{
+    display: -webkit-flex;
+    display: flex;
+  }
+  -webkit-flex-wrap: $wrap;
+    flex-wrap: $wrap;
+}
+@mixin justify-content($justify:space-between){
+-webkit-justify-content: $justify;
+justify-content: $justify;
+}
+@mixin align-items($alignitems:center){
+-webkit-align-items: $alignitems;
+align-items: $alignitems;
+}
+@mixin flex-direction($flex-direction:column){
+  -webkit-flex-direction: $flex-direction;
+  flex-direction: $flex-direction;
+}
+@mixin align-content($align-content:space-between){
+  -webkit-align-content: $align-content;
+  align-content: $align-content;
+}
+@mixin align-self($align-self:center){
+  -ms-flex-item-align:$align-self;
+  -ms-grid-row-align:$align-self;
+  align-self: $align-self;
+}
+@mixin justify-self($justify-self:center){
+  -webkit-justify-self: $justify-self;
+  justify-self: $justify-self;
+}
+
+//transform系//////////////////////////////////////////////////
+@mixin translate($x:0 , $y:0){
+  @each $prefix in $set_prefix {
+    #{$prefix}transform: translate($x, $y);
+  }
+}
+@mixin rotate($deg:0){
+  @each $prefix in $set_prefix {
+    #{$prefix}transform: rotate($deg*1deg);
+  }
+}
+@mixin scale($scale_x:1,$scale_y:1){
+  @each $prefix in $set_prefix {
+    #{$prefix}transform:scale($scale_x, $scale_y);
+  }
+}
+@mixin skew($skew_x:0,$skew_y:0){
+  @each $prefix in $set_prefix {
+    #{$prefix}transform:skew($skew_x*1deg,$skew_y*1deg);
+  }
+}
+@mixin transformAll($translate_x:0,$translate_y:0 ,$deg:0, $scale_x:1, $scale_y:1 ,$skew_x:0,$skew_y:0){
+  @each $prefix in $set_prefix {
+    #{$prefix}transform: translate($translate_x, $translate_y) rotate($deg*1deg) scale($scale_x, $scale_y) skew($skew_x*1deg,$skew_y*1deg);
+  }
+}
+@mixin matrix($scale_x:1,$skew_y:0,$skew_x:0,$scale_y:1,$translate_x:0,$translate_y:0){
+  @each $prefix in $set_prefix {
+    #{$prefix}transform:matrix($scale_x,$skew_y,$skew_x,$scale_y,$translate_x,$translate_y);
+  }
+}
+@mixin transform-origin($origin_x:50%,$origin_y:50%){
+  transform-origin:$origin_x $origin_y;
+}
+
+//filter系//////////////////////////////////////////////////
+@mixin blur($blur:0){
+  filter: blur($blur);
+}
+
+//grid系//////////////////////////////////////////////////
+@mixin grid_box{
+  display: grid;
+  display: -ms-grid;
+//  -ms-grid-rows: $row;
+//  grid-template-rows: $row;
+  
+}
+@mixin grid-template($columns:5,$rows:5){
+  -ms-grid-columns: 1fr [$columns];
+  grid-template-columns: repeat($columns, 1fr);
+//  -ms-grid-rows:(1fr)[$rows];
+//  grid-template-rows:repeat($rows, 1fr);
+  -ms-grid-rows: auto;
+  grid-template-rows: auto;
+  
+  @for $i from 1 through $columns {
+    @if $i == $columns{
+      >*:nth-child(#{$columns}n){
+        -ms-grid-column: $i;
+      }
+    }@else {
+      >*:nth-child(#{$columns}n + #{$i}){
+        -ms-grid-column: $i;
+      }
+    }
+  }
+  $j:1;
+  $j2:1;
+  @while $j < ($rows*$columns) {
+    >*:nth-child(n + #{$j}):nth-child(-n + #{$j + ($columns - 1)}){
+      -ms-grid-row: $j2;
+    }
+    $j: $j + $columns;
+    $j2: $j2 + 1;
+  }
+}
+@mixin grid_item_pos($col_s:1,$col_e:2,$row_s:1,$row_e:2,$ie:false){
+  -ms-grid-column: $col_s !important;
+  -ms-grid-column-span: $col_e - $col_s !important;
+  -ms-grid-row: $row_s !important;
+  -ms-grid-row-span: $row_e - $row_s !important;
+  @if $ie == false {
+    grid-column: #{$col_s} / $col_e ;
+    grid-row: #{$row_s} / $row_e;
+  }
+}
+
+//scroll_btn//////////////////////////////////////////////////
+@mixin scroll_btn($lineBaseW:1px,$lineBaseH:180/$pc_font*1rem,$lineBaseC:#c7c7c7,$lineShortH:90/$pc_font*1rem,$lineShortC:#4c4948,$animeSuffix:"01",$animeS:1.6,$direction:normal){
+  position: relative;
+  padding-bottom:$lineBaseH;
+  &::before,&::after{
+    @include pseudo-base($w:$lineBaseW,$h:null);
+    @include position-x-center;
+  }
+  &::before{
+    height:$lineBaseH;
+    background-color:$lineBaseC;
+    bottom:0;
+  }
+  &::after{
+    height:$lineShortH;
+    background-color:$lineShortC;
+    bottom:$lineBaseH - $lineShortH;
+    @include animetion($s:$animeS,$anime_name:scroll_anime#{$animeSuffix},$direction:$direction);
+  }
+  @at-root{
+    @keyframes scroll_anime#{$animeSuffix}{
+      0%{
+        height:0;
+        bottom:$lineBaseH;
+      }
+      70%{
+        height:$lineBaseH*0.8;
+      }
+      80%{
+        bottom:0;
+      }
+      100%{
+        height:0;
+        bottom:0;
+      }
+    }
+  }
+}
+
+//scroll_btn_PC//////////////////////////////////////////////////
+@mixin scroll_btn_PC($lineBaseW:1px,$lineBaseH:180/$pc_font*1rem,$lineBaseC:#c7c7c7,$lineShortH:90/$pc_font*1rem,$lineShortC:#4c4948,$animeSuffix:"01",$animeS:1.6,$direction:normal){
+  @include media-pc{
+  position: relative;
+  padding-bottom:$lineBaseH;
+  &::before,&::after{
+    @include pseudo-base($w:$lineBaseW,$h:null);
+    @include position-x-center;
+  }
+  &::before{
+    height:$lineBaseH;
+    background-color:$lineBaseC;
+    bottom:0;
+  }
+  &::after{
+    height:$lineShortH;
+    background-color:$lineShortC;
+    bottom:$lineBaseH - $lineShortH;
+    @include animetion($s:$animeS,$anime_name:scroll_anime#{$animeSuffix},$direction:$direction);
+  }
+}
+  @at-root{
+    @keyframes scroll_anime#{$animeSuffix}{
+      0%{
+        height:0;
+        bottom:$lineBaseH;
+      }
+      70%{
+        height:$lineBaseH*0.8;
+      }
+      80%{
+        bottom:0;
+      }
+      100%{
+        height:0;
+        bottom:0;
+      }
+    }
+  }
+}
+
+//scroll_btn_SP//////////////////////////////////////////////////
+@mixin scroll_btn_SP($lineBaseW:1px,$lineBaseH:180/$pc_font*1rem,$lineBaseC:#c7c7c7,$lineShortH:90/$pc_font*1rem,$lineShortC:#4c4948,$animeSuffix:"01",$animeS:1.6,$direction:normal){
+  @include media-sp{
+  position: relative;
+  padding-bottom:$lineBaseH;
+  &::before,&::after{
+    @include pseudo-base($w:$lineBaseW,$h:null);
+    @include position-x-center;
+  }
+  &::before{
+    height:$lineBaseH;
+    background-color:$lineBaseC;
+    bottom:0;
+  }
+  &::after{
+    height:$lineShortH;
+    background-color:$lineShortC;
+    bottom:$lineBaseH - $lineShortH;
+    @include animetion($s:$animeS,$anime_name:scroll_anime#{$animeSuffix},$direction:$direction);
+  }
+}
+  @at-root{
+    @keyframes scroll_anime#{$animeSuffix}{
+      0%{
+        height:0;
+        bottom:$lineBaseH;
+      }
+      70%{
+        height:$lineBaseH*0.8;
+      }
+      80%{
+        bottom:0;
+      }
+      100%{
+        height:0;
+        bottom:0;
+      }
+    }
+  }
+}
+
+
+//cssanimation//////////////////////////////////////////////////
+@mixin animetion($s:0.8,$anime_name:spin,$easing:ease-in-out,$delay:0,$iteration-count:infinite,$direction:normal,$fill-mode:forwards){
+  @each $prefix in $set_prefix {
+    #{$prefix}animation:$anime_name $s*1s $easing $delay*1s $iteration-count $direction $fill-mode;
+  }
+}
+
+//jquery プラグインのカスタム//////////////////////////////
+//slick.js 矢印のカスタム
+@mixin jquery-slick-custom($vec_img:"../images/slider_vecter01.svg",$vec_w:null,$vec_h:null,$prev-left:null,$next-right:null,$vec_v:-50%,$device:pc){
+  .slick-prev,.slick-next{
+    width:$vec_w;
+    height:$vec_h;
+    background-size: 100% 100%;
+    background-image: url($vec_img);
+    opacity: 1;
+    border-radius: 0;
+    @include transition;
+    @if $device == pc {
+      &:hover{
+        opacity:0.7;
+        background-image: url($vec_img);
+      }
+    }
+    &::before{
+      display: none;
+    }
+  }
+  .slick-prev{
+    @include translate($y:$vec_v);
+    left:$prev-left;
+    z-index: 2;
+  }
+  .slick-next{
+    right: $next-right;
+    @include transformAll($translate_y:$vec_v , $scale_x:-1);
+  }
+}
+
+//slick.js dotのカスタム
+@mixin jquery-slick-custom-dot($bottom:null,$li_mgT:null,$li_mgR:null,$li_mgB:null,$li_mgL:null,$w:12px,$h:12px,$border:null,$opacity:null,$hover-opacity:null,$background:null,$hover-background:null,$color:null,$f_size:null,$f_famiry:null,$device:pc){
+  .slick-dots{
+    bottom:$bottom;
+    li{
+      width:auto;
+      height:auto;
+      margin-top: $li_mgT;
+      margin-right: $li_mgR;
+      margin-bottom: $li_mgB;
+      margin-left: $li_mgL;
+      button{
+        font-family: $f_famiry;
+        color:$color;
+        font-size:$f_size;
+        width: $w;
+        height: $h;
+        box-sizing: border-box;
+        border: $border;
+        background: $background;
+        border-radius: 50%;
+        opacity: $opacity;
+        padding: 0;
+        @include transition;
+        &::before{
+          display: none;
+        }
+      }
+      &.slick-active{
+        button{
+          opacity: 1;
+          background: $hover-background;
+        }
+      }
+       @if $device == pc {
+         &:hover{
+           button{
+             opacity: $hover-opacity;
+             background: $hover-background;
+           }
+         }
+      }
+    }
+  }
+}
+
+
+//小数点の表示--設定--//////////////////////////////
+// Round (四捨五入)
+@function round-decimal ($number, $digits: 0) {
+    @return to-fixed($number, $digits, 'round');
+}
+// Ceil (切り上げ)
+@function ceil-decimal ($number, $digits: 0) {
+    @return to-fixed($number, $digits, 'ceil');
+}
+// Floor (切り捨て)
+@function floor-decimal ($number, $digits: 0) {
+    @return to-fixed($number, $digits, 'floor');
+}
+@function to-fixed ($number, $digits: 0, $round: 'round') {
+    $n: 1;
+    // $number must be a number
+    @if type-of($number) != number {
+        @warn '#{ $number } is not a number.';
+        @return $number;
+    }
+    // $digits must be a unitless number
+    @if type-of($digits) != number {
+        @warn '#{ $digits } is not a number.';
+        @return $number;
+    } @else if not unitless($digits) {
+        @warn '#{ $digits } has a unit.';
+        @return $number;
+    }
+    @for $i from 1 through $digits {
+        $n: $n * 10;
+    }
+    @if $round == 'round' {
+        @return round($number * $n) / $n;
+    } @else if $round == 'ceil' {
+        @return ceil($number * $n) / $n;
+    } @else if $round == 'floor' {
+        @return floor($number * $n) / $n;
+    } @else {
+        @warn '#{ $round } is undefined keyword.';
+        @return $number;
+    }
+}
+// round-decimal(0.333)    => 0
+// round-decimal(0.333, 1) => 0.3
+// round-decimal(0.333, 2) => 0.33
+// round-decimal(0.666)    => 1
+// round-decimal(0.666, 1) => 0.7
+// round-decimal(0.666, 2) => 0.67
+
+// ceil-decimal(0.333)     => 1
+// ceil-decimal(0.333, 1)  => 0.4
+// ceil-decimal(0.333, 2)  => 0.34
+// ceil-decimal(0.666)     => 1
+// ceil-decimal(0.666, 1)  => 0.7
+// ceil-decimal(0.666, 2)  => 0.67
+
+// floor-decimal(0.333)    => 0
+// floor-decimal(0.333, 1) => 0.3
+// floor-decimal(0.333, 2) => 0.33
+// floor-decimal(0.666)    => 0
+// floor-decimal(0.666, 1) => 0.6
+// floor-decimal(0.666, 2) => 0.66
+
+
+//横並びの3*3などのflex_boxを縦並びの3*3などに変える（草案）
+///---------------------------*/
+@mixin Landscape_change_flex_box($row:3,$ml:null){
+  @for $i from 0 through #{$row - 1} {
+    &:nth-child(#{$i + ($row - 2)}),&:nth-child(#{$i + ($row + 1)}),&:nth-child(#{$i + ($row + 4)}) {
+      order:#{$i*3};
+    }
+    @if $ml != null{
+      &:nth-child(#{$i + $row + 1}),&:nth-child(#{$i + $row + 4}){
+      margin-left: $ml;
+    }
+    }
+//    &:nth-child(#{$i + $row + 1}),&:nth-child(#{$i + $row + 4}){
+//      margin-left: 30/7.2*1%;
+//    }
+  }
+}
+
+
+
