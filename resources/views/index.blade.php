@@ -1,4 +1,4 @@
-@extends('layout.base')
+@extends('layouts.base')
 
 @php $dir = "home"; @endphp
 @section('style')
