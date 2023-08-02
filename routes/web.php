@@ -24,16 +24,21 @@ Route::get('/', function () {
 Route::get('/company', function () {
   return view('company');
 });
-Route::resource('article', ArticleController::class);
 
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+Route::resource('article', ArticleController::class);
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/user/article', [ArticleController::class, 'user_index'])->name('article_user.index');
+    Route::get('/user/article/{id}', [ArticleController::class, 'update'])->name('article_user.update');
+    Route::get('/user/article/{id}', [ArticleController::class, 'destroy'])->name('article_user.destroy');
 });
 
 require __DIR__.'/auth.php';

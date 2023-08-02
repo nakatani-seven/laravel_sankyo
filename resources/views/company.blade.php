@@ -1,9 +1,6 @@
 @extends('layouts.base')
 
 @php $dir = "company"; @endphp
-<!-- @section('style')
-<link rel="stylesheet" href="{{ asset('assets/css/under.css') }}" media="all">
-@endsection -->
 @section('title', '株式会社  三協')
 
 @section('main')
